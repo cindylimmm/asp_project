@@ -1,60 +1,68 @@
+
+
 import pandas as pd
 import numpy as np
-import matplotlib as plt
-import openpyxl as pyx
+import matplotlib.pyplot as plt
 
-asia = [' Brunei Darussalam ', ' Indonesia ', ' Malaysia ',
+
+dataset = pd.read_excel(r"./Project_File.xlsx")
+
+
+# dimension of dataset
+dataset_dim = dataset.shape
+
+
+# renaming the first column to date
+dataset_rename= dataset.rename(columns={dataset.columns[0]:'year_month'})
+print(dataset_rename)
+
+# split the year_month to year and month columns
+dataset_rename["year"] = dataset_rename["year_month"].str.split().str[0]
+dataset_rename["month"] = dataset_rename["year_month"].str.split().str[1]
+
+print(dataset_rename)
+
+# creating region
+region_asia_df = dataset_rename[['year', ' Brunei Darussalam ', ' Indonesia ', ' Malaysia ',
        ' Philippines ', ' Thailand ', ' Viet Nam ', ' Myanmar ', ' Japan ',
        ' Hong Kong ', ' China ', ' Taiwan ', ' Korea, Republic Of ', ' India ',
-       ' Pakistan ', ' Sri Lanka ', ' Saudi Arabia ', ' Kuwait ', ' UAE ']
-
-europe = [' United Kingdom ', ' Germany ', ' France ', ' Italy ', ' Netherlands ',
-       ' Greece ', ' Belgium & Luxembourg ', ' Switzerland ', ' Austria ',
-       ' Scandinavia ', ' CIS & Eastern Europe ']
-
-other = [' USA ', ' Canada ',
-       ' Australia ', ' New Zealand ', ' Africa ']
-
-# read dataset
-visit_raw_df = pd.read_excel(r'Project_File.xlsx')
-
-# give a name for 1st column
-visit_raw_df.columns.values[0] = "period_year"
-#visit_raw_df = visit_raw_df.rename(columns={'   ': 'date'})
-print(visit_raw_df.columns)
-
-'''
-# replace na to nan
-data2 = visit_raw_df.replace(" na ", np.nan)
-print(data2)
-print(data2.dropna())
-'''
-
-# split period_year into year only
-visit_raw_df["year"] = visit_raw_df["period_year"].str.split().str[0]
-print(visit_raw_df.head())
-print(visit_raw_df.dtypes)
-
-# cast the year column to integer
-visit_raw_df = visit_raw_df.astype({'year':'int'})
-print(visit_raw_df.dtypes)
-
-# filter row by year 2008 to 2017
+       ' Pakistan ', ' Sri Lanka ', ' Saudi Arabia ', ' Kuwait ', ' UAE ']]
 
 
-# cast all column to integer
-visit_raw_df = visit_raw_df.astype({'   ':'int'})
-print(visit_raw_df.dtypes)
-
-# select the column according to region asia
+# cast to integer
+region_asia_df = region_asia_df.astype({'year':'int'})
 
 
-# sum + sort value in descending order
+# filtering to year
+years_df = region_asia_df[(region_asia_df["year"] >= 2008) & (region_asia_df["year"] <= 2017)]
+
+years_df = years_df.astype('int')
+
+print(years_df.dtypes)
+# sum
+total_sum_df = years_df.sum()
+
+print(total_sum_df)
+
+# remove year column
+total_sum_df = total_sum_df.drop('year', axis = 0)
+
+print(total_sum_df)
+# plot
+ps = total_sum_df[:].sort_values()
+index = np.arange(len(ps.index))
+plt.xlabel("Country")
+plt.ylabel("total sum")
+plt.xticks(index, ps.index, fontsize=12, rotation=90)
+plt.title("visitor by country")
+plt.bar(ps.index, ps.values)
+plt.ticklabel_format(useOffset=False, style='plain', axis='y')
+plt.show()
 
 
-
-# plot the graph, bar graph
-
+# top 3
+total_sum_df = total_sum_df.sort_values(ascending=False)
+print(total_sum_df.head(3))
 
 
 
